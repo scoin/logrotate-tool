@@ -1,0 +1,68 @@
+@media (max-width: 1200px) {
+    .filebox {
+        width: 100%;
+    }
+    .container-panel {
+        width: 100%;
+        border: none
+    }
+    #output {
+        margin: 0 auto;
+        width: 80%;
+        height: 100vh;
+    }
+}
+
+@media (min-width: 1200px) {
+    .filebox {
+        width: 40%;
+        float:right;
+    }
+    .container-panel {
+        width: 60%;
+        float: left;
+        border: none
+    }
+    #output {
+        margin-left: 1em;
+        width: 90%;
+        height: 100vh;
+    }
+}
+
+
+
+.directives-header {
+    min-height: 3em;
+    background-color: #4dade6;
+    color: white;
+    margin-bottom: 1em;
+    display: block;
+}
+
+.directives-body {
+    display: inline-block;
+}
+
+.btn-default.active {
+    background-color: #5cb85c !important;
+    border-color:#4cae4c !important;
+    color: white !important;
+}
+
+.button-border {
+    /*vertical-align: middle;*/
+    -moz-box-shadow: 0 0 1px black;
+    -webkit-box-shadow: 0 0 1px black;
+    box-shadow: 0 0 1px black;
+    min-height: 6em;
+    width: 90%;
+    padding: .6em .1em;
+    margin: .0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.directives-header {
+    height: 2em;
+}

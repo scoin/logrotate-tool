@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Log Rotate Config Generator</title>
+        <script id="logfile-template" type="x-tmpl-mustache">
+            <div class="directives-parent text-center">
+                <div class="directives-header">
+                    <a href="#" class="close">&times</a>
+                    <span class="path">/path/to/file.log</span>
+                </div>
+                <div class="logfiles-body directives-body" id="logfiles-body{{index}}" data-type="logfiles" data-index="{{index}}" data-path="/path/to/file.log">
+                    <div class="row" style="padding-bottom:1px">
+                    <div class="button-border">
+                        <div class="col-md-6 text-center">
+                            <div class="input-group input-group-md">
+                                <span class="input-group-addon" id="sizing-addon1">Logfile</span>
+                                <input type="text" class="form-control" id="filepath-input" placeholder="/path/to/file.log" aria-describedby="sizing-addon1">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                   
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="rotate" data-command="rotate" data-argument="#rotate-arg">
+                                        Rotate
+                                        <input id="rotate-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="daily" data-command="daily">Daily</button>
+                                      <button type="button" class="btn btn-default option-setting" id="weekly" data-command="weekly">Weekly</button>
+                                      <button type="button" class="btn btn-default option-setting" id="monthly" data-command="monthly">Monthly</button>
+                                      <button type="button" class="btn btn-default option-setting" id="yearly" data-command="yearly">Yearly</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="minsize" data-command="minsize" data-argument="#minsize-arg">
+                                        Rotate File on Time if Filesize Exceeds
+                                        <input id="minsize-arg" class="form-control btn-arg input-sm" type="text" value="10M">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="size" data-command="size" data-argument="#size-arg">
+                                        Force Rotate Regardless of Time if Filesize Exceeds
+                                        <input id="size-arg" class="form-control btn-arg input-sm" type="text" value="10M">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="create" data-depends-on="#copy:off,#copytruncate:off" data-command="create">Create New File on Rotate</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nocreate" data-command="nocreate">Don't Create New File</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="copy" data-depends-on="#create:off,#copytruncate:off"data-command="copy">Copy File and Do Not Alter</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nocopy" data-command="nocopy">Do Not Copy File</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                       <button type="button" class="btn btn-default option-setting" id="copytruncate" data-depends-on="#create:off,#copy:off" data-command="copytruncate">Copy the File and Truncate Contents</button>
+                                        <button type="button" class="btn btn-default option-setting" id="nocopytruncate" data-command="nocopytruncate">Do Not Copy and Truncate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="start" data-depends-on="#dateext:off,#dateformat:off" data-argument="#start-arg" data-command="start">
+                                        Base Number to Append
+                                        <input id="start-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="extension" data-depends-on="#dateext:off,#dateformat:off" data-argument="#extension-arg" data-command="extension">
+                                        Keep Extension for
+                                        <input id="extension-arg" class="form-control btn-arg input-sm" type="text" value=".log">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-8">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="dateext" data-depends-off="#dateformat:off" data-depends-on="#start:off" data-command="dateext">
+                                        Append Date Extension to File
+                                    </button>
+                                    <button type="button" class="btn btn-default option-setting" data-depends-on="#dateformat:off" data-command="nodateext">
+                                        Don't Append Date Ext.
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="dateformat" data-depends-on="#dateext:on,#start:off" data-argument="#dateformat-arg" data-command="dateformat">
+                                        Format for Date Ext
+                                        <input id="dateformat-arg" class="form-control btn-arg input-sm" type="text" value="-%Y%m%d">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-7">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="missingok" data-command="missingok">Missing File Won't Throw Error</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nomissingok" data-command="nomissingok">Missing File Will Throw Error</button>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="ifempty" data-command="ifempty">Rotate File if Empty</button>
+                                    <button type="button" class="btn btn-default option-setting" id="notifempty" data-command="notifempty">Don't Rotate Empty Files</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                        
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-5">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="compress" data-depends-on="#compresscmd:off" data-depends-off="#uncompresscmd:off,#compressext:off,#compressoptions:off,#delaycompress:off" data-command="compress">Compress Files</button>
+                                    <button type="button" class="btn btn-default option-setting" id="nocompress" data-depends-on="#compresscmd:off,#compressext:off,#uncompresscmd:off,#compressoptions:off" data-command="nocompress">Don't Compress Files</button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="delaycompress" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="delaycompress">
+                                        Delay Compression
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compressext" data-depends-on="#compress:on|#compresscmd:on,#nocompress:off" data-command="compressext" data-argument="#compressext-arg">
+                                        Compressed File Extension
+                                        <input id="compressext-arg" class="form-control btn-arg input-sm" type="text" value=".gz">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compresscmd" data-depends-on="#compress:off,#nocompress:off" data-depends-off="#uncompresscmd:off,#compressext:off,#compressoptions:off" data-command="compresscmd" data-argument="#compresscmd-arg">
+                                        File Compression Command
+                                        <input id="compresscmd-arg" class="form-control btn-arg input-sm" type="text" value="gzip(1)">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compressoptions" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="compressoptions" data-argument="#compressoptions-arg">
+                                        Compression Command Options
+                                        <input id="compressoptions-arg" class="form-control btn-arg input-sm" type="text" value="-9">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="uncompresscmd" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="uncompresscmd" data-argument="#uncompresscmd-arg">
+                                        File Decompression Command
+                                        <input id="uncompresscmd-arg" class="form-control btn-arg input-sm" type="text" value="gunzip(1)">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default option-setting" id="olddir" data-argument="#olddir-arg" data-command="olddir">
+                                    Move Log File To
+                                    <input id="olddir-arg" class="form-control btn-arg input-sm" type="text" value="/path/foo/">
+                                </button>
+                                <button type="button" class="btn btn-default option-setting" id="noolddir" data-command="noolddir">
+                                    Don't Move Log File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id= "mail" data-argument="#mail-arg" data-command="mail" data-depends-off="#mailfirst:off,#maillast:off">
+                                    Email Rotated File To
+                                    <input id="mail-arg" class="form-control btn-arg input-sm" type="text" value="foo@bar.com">
+                                </button>
+                                <button type="button" class="btn btn-default option-setting" id="nomail" data-depends-on= "#mailfirst:off,#maillast:off" data-command="nomail">Don't Mail File</button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="mailfirst" data-depends-on= "#mail:on" data-command="mailfirst">Mail First File</button>
+                                    <button type="button" class="btn btn-default option-setting" id="maillast" data-depends-on= "#mail:on" data-command="maillast">Mail Last File</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id="shred" data-depends-off= "#shredcycles:off" data-command="shred">Shred Files</button>
+                                <button type="button" class="btn btn-default option-setting" id="noshred" data-depends-on= "#shredcycles:off" data-command="noshred">Don't Shred Files</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id="shredcycles" data-depends-on= "#shred:on" data-command="shredcycles" data-argument="#shredcycles-arg">
+                                    Shred Cycles
+                                    <input id="shredcycles-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-default option-setting" id="firstaction" data-argument="#firstaction-arg" data-command="firstaction">
+                                    First Action Script
+                                    <textarea class="form-control btn-arg" id="firstaction-arg" cols=20 rows="5" ></textarea> 
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-default option-setting" id="prerotate" data-argument="#prerotate-arg" data-command="prerotate">
+                                    Pre Rotation Script
+                                    <textarea class="form-control btn-arg" id="prerotate-arg" cols=20 rows="5" ></textarea> 
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-default option-setting" id="postrotate" data-argument="#postrotate-arg" data-command="postrotate">
+                                    Post Rotation Script
+                                    <textarea class="form-control btn-arg" id="postrotate-arg" cols=20 rows="5" ></textarea> 
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button type="button" class="btn btn-default option-setting" id="lastaction" data-argument="#lastaction-arg" data-command="lastaction">
+                                    Last Action Script
+                                    <textarea class="form-control btn-arg" id="lastaction-arg" rows="5" ></textarea> 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+        <script src="scripts/mustache.min.js"></script>
+
+        <script src="scripts/logrotate.js"></script>
+        <script src="scripts/ui.js"></script>
+        <script src="scripts/main.js"></script>
+        <link rel="stylesheet" type="text/css" href="style/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    <div class="container-fluid" id="content">
+        <div class="row"> 
+            <h1 class="text-center">Easy Logrotate Configurator</h1>
+        </div>
+        <div class="row">
+            <div class="btn-group" role="group" aria-label="...">
+                <button type="button" class="btn btn-success autosetting" data-id="pushtos3">Rotate Daily To S3</button>
+                <button type="button" class="btn btn-success autosetting" data-id="apachedefault">Apache Default</button>
+                <button type="button" class="btn btn-danger" id="clear">Clear</button>
+            </div>
+        </div>
+        <div class="container-panel">
+            <div class="directives-parent text-center">
+                <div class="directives-header" id="globaldirectives-header">
+                    Global Directives
+                </div>
+                <div class="global-body directives-body settings-buttons" id="globaldirectives-body" data-type="global">
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="rotate" data-command="rotate" data-argument="#rotate-arg">
+                                        Rotate
+                                        <input id="rotate-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="daily" data-command="daily">Daily</button>
+                                      <button type="button" class="btn btn-default option-setting" id="weekly" data-command="weekly">Weekly</button>
+                                      <button type="button" class="btn btn-default option-setting" id="monthly" data-command="monthly">Monthly</button>
+                                      <button type="button" class="btn btn-default option-setting" id="yearly" data-command="yearly">Yearly</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="minsize" data-command="minsize" data-argument="#minsize-arg">
+                                        Rotate File on Time if Filesize Exceeds
+                                        <input id="minsize-arg" class="form-control btn-arg input-sm" type="text" value="10M">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="size" data-command="size" data-argument="#size-arg">
+                                        Force Rotate Regardless of Time if Filesize Exceeds
+                                        <input id="size-arg" class="form-control btn-arg input-sm" type="text" value="10M">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="create" data-depends-on="#copy:off,#copytruncate:off" data-command="create">Create New File on Rotate</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nocreate" data-command="nocreate">Don't Create New File</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="copy" data-depends-on="#create:off,#copytruncate:off"data-command="copy">Copy File and Do Not Alter</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nocopy" data-command="nocopy">Do Not Copy File</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group option-group" role="group" aria-label="...">
+                                       <button type="button" class="btn btn-default option-setting" id="copytruncate" data-depends-on="#create:off,#copy:off" data-command="copytruncate">Copy the File and Truncate Contents</button>
+                                        <button type="button" class="btn btn-default option-setting" id="nocopytruncate" data-command="nocopytruncate">Do Not Copy and Truncate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="start" data-depends-on="#dateext:off,#dateformat:off" data-argument="#start-arg" data-command="start">
+                                        Base Number to Append
+                                        <input id="start-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="extension" data-depends-on="#dateext:off,#dateformat:off" data-argument="#extension-arg" data-command="extension">
+                                        Keep Extension for
+                                        <input id="extension-arg" class="form-control btn-arg input-sm" type="text" value=".log">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-8">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="dateext" data-depends-off="#dateformat:off" data-depends-on="#start:off" data-command="dateext">
+                                        Append Date Extension to File
+                                    </button>
+                                    <button type="button" class="btn btn-default option-setting" data-depends-on="#dateformat:off" data-command="nodateext">
+                                        Don't Append Date Ext.
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="dateformat" data-depends-on="#dateext:on,#start:off" data-argument="#dateformat-arg" data-command="dateformat">
+                                        Format for Date Ext
+                                        <input id="dateformat-arg" class="form-control btn-arg input-sm" type="text" value="-%Y%m%d">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-7">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="missingok" data-command="missingok">Missing File Won't Throw Error</button>
+                                      <button type="button" class="btn btn-default option-setting" id="nomissingok" data-command="nomissingok">Missing File Will Throw Error</button>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="ifempty" data-command="ifempty">Rotate File if Empty</button>
+                                    <button type="button" class="btn btn-default option-setting" id="notifempty" data-command="notifempty">Don't Rotate Empty Files</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                        
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-5">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="compress" data-depends-on="#compresscmd:off" data-depends-off="#uncompresscmd:off,#compressext:off,#compressoptions:off,#delaycompress:off" data-command="compress">Compress Files</button>
+                                    <button type="button" class="btn btn-default option-setting" id="nocompress" data-depends-on="#compresscmd:off,#compressext:off,#uncompresscmd:off,#compressoptions:off" data-command="nocompress">Don't Compress Files</button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="delaycompress" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="delaycompress">
+                                        Delay Compression
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compressext" data-depends-on="#compress:on|#compresscmd:on,#nocompress:off" data-command="compressext" data-argument="#compressext-arg">
+                                        Compressed File Extension
+                                        <input id="compressext-arg" class="form-control btn-arg input-sm" type="text" value=".gz">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compresscmd" data-depends-on="#compress:off,#nocompress:off" data-depends-off="#uncompresscmd:off,#compressext:off,#compressoptions:off" data-command="compresscmd" data-argument="#compresscmd-arg">
+                                        File Compression Command
+                                        <input id="compresscmd-arg" class="form-control btn-arg input-sm" type="text" value="gzip(1)">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="compressoptions" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="compressoptions" data-argument="#compressoptions-arg">
+                                        Compression Command Options
+                                        <input id="compressoptions-arg" class="form-control btn-arg input-sm" type="text" value="-9">
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group" aria-label="...">
+                                      <button type="button" class="btn btn-default option-setting" id="uncompresscmd" data-depends-on="#compresscmd:on|#compress:on,#nocompress:off" data-command="uncompresscmd" data-argument="#uncompresscmd-arg">
+                                        File Decompression Command
+                                        <input id="uncompresscmd-arg" class="form-control btn-arg input-sm" type="text" value="gunzip(1)">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default option-setting" id="olddir" data-argument="#olddir-arg" data-command="olddir">
+                                    Move Log File To
+                                    <input id="olddir-arg" class="form-control btn-arg input-sm" type="text" value="/path/foo/">
+                                </button>
+                                <button type="button" class="btn btn-default option-setting" id="noolddir" data-command="noolddir">
+                                    Don't Move Log File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id= "mail" data-argument="#mail-arg" data-command="mail" data-depends-off="#mailfirst:off,#maillast:off">
+                                    Email Rotated File To
+                                    <input id="mail-arg" class="form-control btn-arg input-sm" type="text" value="foo@bar.com">
+                                </button>
+                                <button type="button" class="btn btn-default option-setting" id="nomail" data-depends-on= "#mailfirst:off,#maillast:off" data-command="nomail">Don't Mail File</button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" class="btn btn-default option-setting" id="mailfirst" data-depends-on= "#mail:on" data-command="mailfirst">Mail First File</button>
+                                    <button type="button" class="btn btn-default option-setting" id="maillast" data-depends-on= "#mail:on" data-command="maillast">Mail Last File</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="button-border">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id="shred" data-depends-off= "#shredcycles:off" data-command="shred">Shred Files</button>
+                                <button type="button" class="btn btn-default option-setting" id="noshred" data-depends-on= "#shredcycles:off" data-command="noshred">Don't Shred Files</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default option-setting" id="shredcycles" data-depends-on= "#shred:on" data-command="shredcycles" data-argument="#shredcycles-arg">
+                                    Shred Cycles
+                                    <input id="shredcycles-arg" class="form-control btn-arg input-sm" type="number" value="1">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div id="logfile-container">
+            </div>
+            <div class="panel panel-warning text-center">
+                <div class="panel-heading" id="add-logfile">
+                    Add Another Log File
+                </div>
+            </div>
+        </div>
+        <div class="filebox">
+            <textarea class="form-control" id="output" readonly="true" rows="20" ></textarea>
+            <button id="save-file">Save File</button>
+        </div>
+    </div>
+    </body>
+</html>
+
